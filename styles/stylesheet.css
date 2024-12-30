@@ -114,3 +114,27 @@ section {
     margin-right: auto;
     width: 50%;
   }
+
+/*Xavier's CSS*/
+.codingwithcat {
+    font-family:'Courier New', Courier, monospace; 
+    font-size: 30px;
+    color:  rgb(71, 197, 174);;
+    text-align: center;
+}
+
+.javascratch {
+    border: 10px solid rgb(71, 197, 174);
+    width: 400px;
+    height: auto;
+    border-radius: 50px;
+    display: block;
+    margin: auto;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; 
+}
+
+.javascratch:hover {
+    transform: scale(1.1);
+    filter: grayscale(70%); 
+    border-color: black
+}
