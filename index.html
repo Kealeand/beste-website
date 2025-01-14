@@ -420,6 +420,54 @@
                      >
             </section
             >
+
+            <section id="Write-A-Storry">
+                <div id="Write-A-Storry_form">
+                    <dialog open="true" id="Write-A-Storry_form_dialog">
+
+                        <h2>schrijf je eigen verhaal</h2>
+                        <p>beantwoord de vragen hieronder om je eigen verhaal te schrijven. gemaakt met aleen css en html.</p>
+
+                        <form method="dialog">
+
+                    
+                            <label for="name" >je eigen naam of een random naam.</label><br>
+                            <input type="text" name="name" placeholder="jantje" oninput="document.getElementById('Write-A-Storry_story_name').innerText = this.value" id="Write-A-Storry_form_name">
+                            <br>
+                            <label for="place" >een plaats.</label><br>
+                            <input type="text" name="place" placeholder="amsterdam" oninput="document.getElementById('Write-A-Storry_story_place').innerText = this.value" id="Write-A-Storry_form_name">
+                            <br>
+                            <label for="store" >naam van een winkel.</label><br>
+                            <input type="text" name="store" placeholder="dirk" oninput="document.getElementById('Write-A-Storry_story_store').innerText = this.value" id="Write-A-Storry_form_store">
+                            <br>
+                            <label for="product" >naam van een product.</label><br>
+                            <input type="text" name="product" placeholder="chips" oninput="document.getElementById('Write-A-Storry_story_product').innerText = this.value" id="Write-A-Storry_form_product">
+                            <br>
+                            <label for="products" >type een paar producten.</label><br>
+                            <textarea name="products" placeholder="aardapels, bannaanen en peren" oninput="document.getElementById('Write-A-Storry_story_products').innerText = this.value" id="Write-A-Storry_form_products"></textarea>
+                            <br>
+                            <label for="product" >naam van een beroep.</label><br>
+                            <input type="text" name="product" placeholder="leerraar" oninput="document.getElementById('Write-A-Storry_story_job').innerText = this.value" id="Write-A-Storry_form_job">
+                            <br>
+                            <label for="end" >antwoord met wel of niet: ben je blij vandaag?</label><br>
+                            <input type="text" name="end" placeholder="wel" oninput="document.getElementById('Write-A-Storry_story_end').innerText = this.value" id="Write-A-Storry_form_end">
+                            <br>
+                            <input type="submit" value="start" id="Write-A-Storry_form_submit">
+                        </form> 
+                    </dialog>
+                    
+                </div>
+
+                <div id="Write-A-Storry_story">
+                    <p>een man genaamd <span id="Write-A-Storry_story_name">jantje</span> liep in <span id="Write-A-Storry_story_place">amsterdam</span>. 
+                        toen kwam hij bij de <span id="Write-A-Storry_story_store">dirk</span>. 
+                        hij liep naar binnen en zag <span id="Write-A-Storry_story_product">chips</span>. hij deed dat in zijn zak. hij haalde ook nog <span id="Write-A-Storry_story_products">aardapels, bannaanen en peren</span>.
+                        hij deed deze producten in een mandje en ging naar de kassa hij rekende alle producten af. maar niet wat in zijn zak zit. toen rende hij naar buiten. maar hij werd achtervolgt door een <span id="Write-A-Storry_story_job">leeraar</span>.
+                        na uren rennen wist hij uitijndelijk <span id="Write-A-Storry_story_end">niet</span> te ontkomen.
+                    </p>
+                </div>
+                <br>
+            </section>
         </div>
     </body>
 </html>
