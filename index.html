@@ -468,6 +468,224 @@
                 </div>
                 <br>
             </section>
+            <section>
+                <style>
+                    /* Container for grid */
+                    .grid-container {
+                        display: grid;
+                        grid-template-columns: repeat(3, 100px);
+                        grid-template-rows: repeat(3, 100px);
+                        gap: 5px;
+                        justify-content: center;
+                        align-items: center;
+                        color: aliceblue;
+                    }
+            
+                    /* Each individual cube */
+                    .cube {
+                        width: 100px;
+                        height: 100px;
+                        background-color: #3ab3ff;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        border: 2px solid rgb(62, 146, 215);
+                        cursor: pointer;
+                        transition: background-color 0.3s;
+                        box-shadow: 0px 0px 5px rgb(85, 85, 85);
+                        border-radius: 5px;
+                    }
+            
+                    /* Hover effect */
+                    .cube:hover {
+                        background-color: rgb(178, 233, 255);
+                    }
+
+                    .cube:active {
+                        background-color: #3ab3ff;
+                    }
+                    
+                    .cubeClickAnimation {
+                        animation: bounce 0.25s both;
+                    }
+            
+                    /* Flash effect */
+                    .flash {
+                        background-color: rgb(0, 123, 255) !important;
+                    }
+            
+                    /* Disabled state when user cannot click during sequence */
+                    .disabled {
+                        pointer-events: none;
+                    }
+
+                    .fancyText {
+                        font-size: large;
+                        font-weight: bold;
+                    }
+
+                    @keyframes bounce {
+                        0% {
+                            transform: scale(100%);
+                        }
+
+                        50% {
+                            transform: scale(90%);
+                        }
+
+                        100% {
+                            transform: scale(100%);
+                        }
+                    }
+
+                </style>
+                <div style="text-align: center;">
+                    <h1>Memory Game</h1>
+                    <div class="grid-container" id="grid-container">
+                        <!-- Cube here -->
+                    </div>
+                    <button id="startBtn" class="fancyText">Start Game</button>
+                    <p id="status" class="fancyText">Click "Start Game" to begin!</p>
+                </div>
+            <script> // Script area
+                const gridContainer = document.getElementById('grid-container');
+                const startBtn = document.getElementById('startBtn');
+                const status = document.getElementById('status');
+                
+                // Function to generate the grid
+                function generateGrid(rows, cols) {
+                    gridContainer.innerHTML = ''; // Clear existing cubes
+                    for (let i = 1; i <= rows * cols; i++) {
+                        const cube = document.createElement('div');
+                        cube.classList.add('cube');
+                        cube.setAttribute('data-id', i);
+                        cube.textContent = `◯`;
+                        cube.style.fontWeight = 'Bold';
+                        
+                        // Add click event to each cube
+                        cube.addEventListener('click', () => {
+                            handleUserClick(cube);
+                            cube.classList.add("cubeClickAnimation");
+                            setTimeout(() => {
+                                cube.classList.remove("cubeClickAnimation");
+                            }, 250);
+                        });
+                        gridContainer.appendChild(cube);
+                    }
+                }
+
+                // SetTimeout delays
+                let delay = 750;
+                let flashTime = 500;
+
+                // Game variables
+                let userSequence = [];
+                let gameSequence = [];
+                let gameActive = false
+                let round = 1;
+                
+                // Handle user click during game sequence
+                function handleUserClick(cube) {
+                    const cubeId = parseInt(cube.getAttribute('data-id'));
+                    userSequence.push(cubeId);
+                    
+                    if (userSequence[userSequence.length - 1] !== gameSequence[userSequence.length - 1]) {
+                        // incorrect click
+                        status.innerHTML = 'Wrong sequence, game over!<br>Click "Start Game" to play again!';
+                        resetGame();
+                        return;
+                    }
+            
+                    if (userSequence.length === gameSequence.length) {
+                        if (userSequence.length === 5) {
+                            status.innerHTML = 'You won the game, congratulations!<br>Click "Start Game" to play again!';
+                            // Ah feck it, why even optimize code anyways? Don't fix what ain't broken
+                            flashAllCubes();
+                            setTimeout(flashAllCubes,450)
+                            setTimeout(resetGame,600)
+                        } else {
+                            // Move to next round
+                            disableUserInput();
+                            round++;
+                            status.textContent = `Round ${round}`;
+                            userSequence = [];
+                            setTimeout(startRound, delay); // Start next round after delay
+                        }
+                    }
+                }
+            
+                // Start new round by adding a new cube to the sequence
+                function startRound() {
+                    gameSequence.push(Math.floor(Math.random() * 9) + 1); // Random cube ID between 1 and 9
+                    showSequence(gameSequence);
+                }
+            
+                // Flash cubes in the sequence
+                function showSequence(sequence) {
+                    let i = 0;
+                    const interval = setInterval(() => {
+                        flashCube(sequence[i]);
+                        i++;
+                        if (i >= sequence.length) {
+                            clearInterval(interval);
+                            setTimeout(enableUserInput,flashTime);
+                        }
+                    }, delay);
+                }
+            
+                // Flash a cube
+                function flashCube(id) {
+                    const cube = document.querySelector(`.cube[data-id="${id}"]`);
+                    cube.classList.add('flash');
+                    setTimeout(() => {
+                        cube.classList.remove('flash');
+                    }, flashTime);
+                }
+                
+                // Flash all cubes when round has been won
+                function flashAllCubes() {
+                    for (let i = 1; i <= 9; i++) {
+                        const cube = document.querySelector(`.cube[data-id="${i}"]`);
+                        cube.classList.add('flash');
+                        setTimeout(() => {
+                            cube.classList.remove('flash');
+                        }, 200);
+                    }
+                }
+
+                // Enable clicking after sequence finishes
+                function enableUserInput() {
+                    userSequence = [];
+                    gridContainer.classList.remove('disabled');
+                }
+            
+                // Disable clicking while sequence is flashing
+                function disableUserInput() {
+                    gridContainer.classList.add('disabled');
+                }
+            
+                // Reset game
+                function resetGame() {
+                    gameActive = false
+                    gameSequence = [];
+                    round = 1;
+                    disableUserInput();
+                }
+            
+                // Start button
+                startBtn.addEventListener('click', () => {
+                    if (gameActive == false) {
+                        gameActive = true
+                        gameSequence = [];
+                        round = 1;
+                        status.textContent = `Round ${round}`;
+                        generateGrid(3, 3);
+                        setTimeout(startRound, delay); // Start first round after delay
+                        disableUserInput(); // Disable user input until first round starts
+                    }
+                });
+            </script>
+            </section>
         </div>
     </body>
 </html>
