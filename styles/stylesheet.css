@@ -196,3 +196,20 @@ section {
     overflow: hidden;
     overflow-y: scroll;
 }
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 175% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.mmg-record {
+    background: linear-gradient(75deg, #ff5e5e, #e7932d, #f7d703, #4edb47, #25afff, #ed25ff);
+    background-clip:content-box;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 150% 150%;
+    font-size: 20px;
+    font-weight: bolder;
+    animation: gradientShift 8s ease-in-out infinite;
+}

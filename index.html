@@ -561,147 +561,181 @@
                     <div class="grid-container" id="grid-container">
                         <!-- Cube here -->
                     </div>
-                    <button id="startBtn" class="fancyText">Start Game</button>
-                    <p id="status" class="fancyText">Click "Start Game" to begin!</p>
+                    <button id="startBtn" class="fancyText">Start Game</button> <br>
+                    <button id="startBtnEndless" class="fancyText">Endless Mode</button>
+                    <p id="status" class="fancyText">Click "Start Game" to begin!</p><br>
+                    <p class="mmg-record">My record: 19</p>
                 </div>
-            <script> // Script area
-                const gridContainer = document.getElementById('grid-container');
-                const startBtn = document.getElementById('startBtn');
-                const status = document.getElementById('status');
-                
-                // Function to generate the grid
-                function generateGrid(rows, cols) {
-                    gridContainer.innerHTML = ''; // Clear existing cubes
-                    for (let i = 1; i <= rows * cols; i++) {
-                        const cube = document.createElement('div');
-                        cube.classList.add('cube');
-                        cube.setAttribute('data-id', i);
-                        cube.textContent = `◯`;
-                        cube.style.fontWeight = 'Bold';
-                        
-                        // Add click event to each cube
-                        cube.addEventListener('click', () => {
-                            handleUserClick(cube);
-                            cube.classList.add("cubeClickAnimation");
-                            setTimeout(() => {
-                                cube.classList.remove("cubeClickAnimation");
-                            }, 250);
-                        });
-                        gridContainer.appendChild(cube);
-                    }
-                }
-
-                // SetTimeout delays
-                let delay = 750;
-                let flashTime = 500;
-
-                // Game variables
-                let userSequence = [];
-                let gameSequence = [];
-                let gameActive = false
-                let round = 1;
-                
-                // Handle user click during game sequence
-                function handleUserClick(cube) {
-                    const cubeId = parseInt(cube.getAttribute('data-id'));
-                    userSequence.push(cubeId);
+                <script> // Script area
+                    const gridContainer = document.getElementById('grid-container');
+                    const startBtn = document.getElementById('startBtn');
+                    const endlessBtn = document.getElementById('startBtnEndless');
+                    const status = document.getElementById('status');
                     
-                    if (userSequence[userSequence.length - 1] !== gameSequence[userSequence.length - 1]) {
-                        // incorrect click
-                        status.innerHTML = 'Wrong sequence, game over!<br>Click "Start Game" to play again!';
-                        resetGame();
-                        return;
+                    // Function to generate the grid
+                    function generateGrid(rows, cols) {
+                        gridContainer.innerHTML = ''; // Clear existing cubes
+                        for (let i = 1; i <= rows * cols; i++) {
+                            const cube = document.createElement('div');
+                            cube.classList.add('cube');
+                            cube.setAttribute('data-id', i);
+                            cube.textContent = `◯`;
+                            cube.style.fontWeight = 'Bold';
+                            cube.style.userSelect = "none";
+                            
+                            // Add click event to each cube
+                            cube.addEventListener('click', () => {
+                                handleUserClick(cube);
+                                cube.classList.add("cubeClickAnimation");
+                                setTimeout(() => {
+                                    cube.classList.remove("cubeClickAnimation");
+                                }, 250);
+                            });
+                            gridContainer.appendChild(cube);
+                        }
                     }
-            
-                    if (userSequence.length === gameSequence.length) {
-                        if (userSequence.length === 5) {
-                            status.innerHTML = 'You won the game, congratulations!<br>Click "Start Game" to play again!';
-                            // Ah feck it, why even optimize code anyways? Don't fix what ain't broken
+
+                    // SetTimeout delays and speed control
+                    let maxSpeed = 300 // Change for maximum flash speed in general
+                    let speedMult = 30 // Change for finer difficulty ramp control
+                    let delay = 750; // Change for base flash speed
+                    let flashTime = 500; // Change for cube flash effect base
+
+                    // Game variables
+                    let userSequence = []; // User's input sequence
+                    let gameSequence = []; // Cube flash sequence
+                    let gameActive = false // If the game is on
+                    let endlessActive = false // If endless is played
+                    let round = 1; // Current round variable
+                    let roundAmount = 8 // Amount of rounds in base mode
+                    
+                    // Handle user click during game sequence
+                    function handleUserClick(cube) {
+                        const cubeId = parseInt(cube.getAttribute('data-id'));
+                        userSequence.push(cubeId);
+
+                        // Re-use the round display. Only one change needed now! As DRY as a cracker, if you know what I mean
+                        let roundText = '<p style="font-size: 15px;">Round reached: ' + round + '</p>';
+                        
+                        if (userSequence[userSequence.length - 1] !== gameSequence[userSequence.length - 1]) {
+                            // incorrect cube clicked
+                            if (round >= 50) {
+                                status.innerHTML = 'Wrong sequence, game over!<br>YOU are the memory game grandmaster!<br>Click "Start Game" to play again!' + roundText
+                            } else if (round >= 20) {
+                                status.innerHTML = 'Wrong sequence, game over!<br>Wow! Amazing job!<br>Click "Start Game" to play again!' + roundText
+                            } else if (round >= 10) {
+                                status.innerHTML = 'Wrong sequence, game over!<br>Well done!<br>Click "Start Game" to play again!' + roundText
+                            } else {
+                                status.innerHTML = 'Wrong sequence, game over!<br>Click "Start Game" to play again!' + roundText
+                            }
                             flashAllCubes();
-                            setTimeout(flashAllCubes,450)
-                            setTimeout(resetGame,600)
-                        } else {
-                            // Move to next round
-                            disableUserInput();
-                            round++;
-                            status.textContent = `Round ${round}`;
-                            userSequence = [];
-                            setTimeout(startRound, delay); // Start next round after delay
+                            resetGame();
+                            return;
+                        }
+                
+                        if (userSequence.length === gameSequence.length) {
+                            if (userSequence.length === roundAmount && endlessActive == false) {
+                                status.innerHTML = 'You won the game, congratulations!<br>Click "Start Game" to play again!';
+                                // Ah feck it, why even optimize code anyways? Don't fix what ain't broken
+                                flashAllCubes();
+                                setTimeout(flashAllCubes,450)
+                                setTimeout(resetGame,600)
+                            } else {
+                                // Move to next round
+                                disableUserInput();
+                                round++;
+                                status.textContent = `Round ${round}`;
+                                userSequence = [];
+                                setTimeout(startRound, 500);
+                            }
                         }
                     }
-                }
-            
-                // Start new round by adding a new cube to the sequence
-                function startRound() {
-                    gameSequence.push(Math.floor(Math.random() * 9) + 1); // Random cube ID between 1 and 9
-                    showSequence(gameSequence);
-                }
-            
-                // Flash cubes in the sequence
-                function showSequence(sequence) {
-                    let i = 0;
-                    const interval = setInterval(() => {
-                        flashCube(sequence[i]);
-                        i++;
-                        if (i >= sequence.length) {
-                            clearInterval(interval);
-                            setTimeout(enableUserInput,flashTime);
-                        }
-                    }, delay);
-                }
-            
-                // Flash a cube
-                function flashCube(id) {
-                    const cube = document.querySelector(`.cube[data-id="${id}"]`);
-                    cube.classList.add('flash');
-                    setTimeout(() => {
-                        cube.classList.remove('flash');
-                    }, flashTime);
-                }
                 
-                // Flash all cubes when round has been won
-                function flashAllCubes() {
-                    for (let i = 1; i <= 9; i++) {
-                        const cube = document.querySelector(`.cube[data-id="${i}"]`);
+                    // Start new round by adding a new cube to the sequence
+                    function startRound() {
+                        gameSequence.push(Math.floor(Math.random() * 9) + 1); // Random cube ID between 1 and 9
+                        showSequence(gameSequence);
+                    }
+                
+                    // Flash cubes in the sequence
+                    function showSequence(sequence) {
+                        let i = 0;
+                        const interval = setInterval(() => {
+                            flashCube(sequence[i]);
+                            i++;
+                            if (i >= sequence.length) {
+                                clearInterval(interval);
+                                setTimeout(enableUserInput,Math.max(maxSpeed, flashTime - (round * speedMult)));
+                            }
+                        }, Math.max(maxSpeed, delay - (round * speedMult)));
+                    }
+                
+                    // Flash a cube
+                    function flashCube(id) {
+                        const cube = document.querySelector(`.cube[data-id="${id}"]`);
                         cube.classList.add('flash');
                         setTimeout(() => {
                             cube.classList.remove('flash');
-                        }, 200);
+                        }, Math.max(maxSpeed, flashTime - (round * speedMult)));
                     }
-                }
+                    
+                    // Flash all cubes when round has been won
+                    function flashAllCubes() {
+                        for (let i = 1; i <= 9; i++) {
+                            const cube = document.querySelector(`.cube[data-id="${i}"]`);
+                            cube.classList.add('flash');
+                            setTimeout(() => {
+                                cube.classList.remove('flash');
+                            }, 200);
+                        }
+                    }
 
-                // Enable clicking after sequence finishes
-                function enableUserInput() {
-                    userSequence = [];
-                    gridContainer.classList.remove('disabled');
-                }
-            
-                // Disable clicking while sequence is flashing
-                function disableUserInput() {
-                    gridContainer.classList.add('disabled');
-                }
-            
-                // Reset game
-                function resetGame() {
-                    gameActive = false
-                    gameSequence = [];
-                    round = 1;
-                    disableUserInput();
-                }
-            
-                // Start button
-                startBtn.addEventListener('click', () => {
-                    if (gameActive == false) {
-                        gameActive = true
+                    // Enable clicking after sequence finishes
+                    function enableUserInput() {
+                        userSequence = [];
+                        gridContainer.classList.remove('disabled');
+                    }
+                
+                    // Disable clicking while sequence is flashing
+                    function disableUserInput() {
+                        gridContainer.classList.add('disabled');
+                    }
+                
+                    // Reset game
+                    function resetGame() {
+                        gameActive = false
+                        endlessActive = false
                         gameSequence = [];
                         round = 1;
-                        status.textContent = `Round ${round}`;
-                        generateGrid(3, 3);
-                        setTimeout(startRound, delay); // Start first round after delay
-                        disableUserInput(); // Disable user input until first round starts
+                        disableUserInput();
                     }
-                });
-            </script>
+                
+                    // Start button for a regular ol' game
+                    startBtn.addEventListener('click', () => {
+                        if (gameActive == false) {
+                            gameActive = true
+                            gameSequence = [];
+                            round = 1;
+                            status.textContent = `Round ${round}`;
+                            generateGrid(3, 3);
+                            setTimeout(startRound, delay); // Start first round after delay
+                            disableUserInput(); // Disable user input until first round starts
+                        }
+                    });
+
+                    // Endless mode for those rather... daring
+                    endlessBtn.addEventListener('click', () => {
+                        if (gameActive == false) {
+                            gameActive = true
+                            endlessActive = true // It's endlessin' time (if you read this, I dare you to make it to round 20! (:< good luck.)
+                            gameSequence = [];
+                            status.textContent = `Round ${round}`;
+                            generateGrid(3, 3);
+                            setTimeout(startRound, delay); // Start first round after delay
+                            disableUserInput(); // Disable user input until first round starts
+                        }
+                    });
+                </script>
             </section>
             <section>
                 <img src="images/why-to-be-cat.webp" alt="6 Reasons why you should be a cat. 1. Free food. 2. Free rent. 3. Sleep as long as you want to. 4. Look great with no effort. 5. Toes look like beans. 6. Lisence to kill.">
